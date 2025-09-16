@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slepá mapa Evropy - Kvíz hlavních měst</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            background: #fff;
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00c851, #007e33);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .score-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .game-area {
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .quiz-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .country-name {
+            color: #4facfe;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .input-container {
+            margin: 30px 0;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .completion-message {
+            background: linear-gradient(135deg, #00c851 0%, #007e33 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .completion-message h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #007e33;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.8rem;
+            }
+            
+            .country-name {
+                font-size: 2.5rem;
+            }
+
+            .quiz-panel {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Slepá mapa Evropy</h1>
+            <p>Kvíz hlavních měst evropských států</p>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="score-text">
+                    <span id="currentScore">0</span> / <span id="targetScore">150</span> bodů
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="quiz-panel">
+                <div class="question">
+                    Jaké je hlavní město státu:
+                    <div class="country-name" id="currentCountry">Francie</div>
+                </div>
+
+                <div class="input-container">
+                    <input type="text" id="answerInput" class="answer-input" placeholder="Zadejte hlavní město..." autocomplete="off">
+                </div>
+
+                <button id="submitBtn" class="submit-btn">Odpovědět</button>
+
+                <div id="feedback" class="feedback" style="display: none;"></div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="correctAnswers">0</div>
+                        <div class="stat-label">Správné</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalQuestions">0</div>
+                        <div class="stat-label">Celkem</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="accuracy">100%</div>
+                        <div class="stat-label">Úspěšnost</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="completionMessage" class="completion-message">
+            <h2>🎉 Gratulujeme!</h2>
+            <p>Dosáhli jste cílového skóre 150 bodů!</p>
+            <button id="restartBtn" class="restart-btn">Začít znovu</button>
+        </div>
+    </div>
+
+    <script>
+        const countries = {
+            'Francie': 'Paříž',
+            'Německo': 'Berlín',
+            'Itálie': 'Řím',
+            'Španělsko': 'Madrid',
+            'Polsko': 'Varšava',
+            'Velká Británie': 'Londýn',
+            'Nizozemsko': 'Amsterdam',
+            'Švédsko': 'Stockholm',
+            'Norsko': 'Oslo',
+            'Dánsko': 'Kodaň',
+            'Finsko': 'Helsinky',
+            'Rakousko': 'Vídeň',
+            'Švýcarsko': 'Bern',
+            'Belgie': 'Brusel',
+            'Portugalsko': 'Lisabon',
+            'Řecko': 'Atény',
+            'Turecko': 'Ankara',
+            'Rumunsko': 'Bukurešť',
+            'Bulharsko': 'Sofie',
+            'Maďarsko': 'Budapešť',
+            'Česko': 'Praha',
+            'Slovensko': 'Bratislava',
+            'Slovinsko': 'Lublaň',
+            'Chorvatsko': 'Záhreb',
+            'Srbsko': 'Bělehrad',
+            'Ukrajina': 'Kyjev',
+            'Bělorusko': 'Minsk',
+            'Litva': 'Vilnius',
+            'Lotyšsko': 'Riga',
+            'Estonsko': 'Tallinn'
+        };
+
+        let currentCountry = '';
+        let score = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 0;
+        let usedCountries = [];
+        const targetScore = 150;
+        const pointsPerCorrect = 5;
+
+        const elements = {
+            currentCountry: document.getElementById('currentCountry'),
+            answerInput: document.getElementById('answerInput'),
+            submitBtn: document.getElementById('submitBtn'),
+            feedback: document.getElementById('feedback'),
+            currentScore: document.getElementById('currentScore'),
+            progressFill: document.getElementById('progressFill'),
+            correctAnswers: document.getElementById('correctAnswers'),
+            totalQuestions: document.getElementById('totalQuestions'),
+            accuracy: document.getElementById('accuracy'),
+            completionMessage: document.getElementById('completionMessage'),
+            restartBtn: document.getElementById('restartBtn')
+        };
+
+        function getRandomCountry() {
+            const availableCountries = Object.keys(countries).filter(country => 
+                !usedCountries.includes(country)
+            );
+            
+            if (availableCountries.length === 0) {
+                usedCountries = [];
+                return Object.keys(countries)[Math.floor(Math.random() * Object.keys(countries).length)];
+            }
+            
+            return availableCountries[Math.floor(Math.random() * availableCountries.length)];
+        }
+
+        function nextQuestion() {
+            if (score >= targetScore) {
+                showCompletion();
+                return;
+            }
+            
+            currentCountry = getRandomCountry();
+            usedCountries.push(currentCountry);
+            elements.currentCountry.textContent = currentCountry;
+            elements.answerInput.value = '';
+            elements.answerInput.focus();
+            elements.feedback.style.display = 'none';
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .trim();
+        }
+
+        function checkAnswer() {
+            const userAnswer = elements.answerInput.value.trim();
+            const correctAnswer = countries[currentCountry];
+            
+            if (!userAnswer) {
+                showFeedback('Prosím zadejte odpověď!', false);
+                return;
+            }
+
+            const isCorrect = normalizeText(userAnswer) === normalizeText(correctAnswer);
+            
+            totalQuestions++;
+            
+            if (isCorrect) {
+                correctAnswers++;
+                score += pointsPerCorrect;
+                showFeedback(`✅ Správně! ${currentCountry} - ${correctAnswer}`, true);
+            } else {
+                showFeedback(`❌ Špatně! Správná odpověď: ${correctAnswer}`, false);
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                nextQuestion();
+            }, 2000);
+        }
+
+        function showFeedback(message, isCorrect) {
+            elements.feedback.textContent = message;
+            elements.feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            elements.feedback.style.display = 'block';
+        }
+
+        function updateStats() {
+            elements.currentScore.textContent = score;
+            elements.correctAnswers.textContent = correctAnswers;
+            elements.totalQuestions.textContent = totalQuestions;
+            
+            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 100;
+            elements.accuracy.textContent = accuracy + '%';
+            
+            const progress = Math.min((score / targetScore) * 100, 100);
+            elements.progressFill.style.width = progress + '%';
+        }
+
+        function showCompletion() {
+            elements.completionMessage.style.display = 'block';
+            elements.completionMessage.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetGame() {
+            score = 0;
+            correctAnswers = 0;
+            totalQuestions = 0;
+            usedCountries = [];
+            elements.completionMessage.style.display = 'none';
+            updateStats();
+            nextQuestion();
+        }
+
+        // Event listeners
+        elements.submitBtn.addEventListener('click', checkAnswer);
+        elements.restartBtn.addEventListener('click', resetGame);
+
+        elements.answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Spuštění hry
+        nextQuestion();
+    </script>
+</body>
+</html>
